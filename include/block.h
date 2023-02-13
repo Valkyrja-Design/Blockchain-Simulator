@@ -33,9 +33,6 @@ class block{
         void add(std::shared_ptr<transaction> txn);
         void add_coinbase_txn(int mining_fee);
         void set_parent(std::shared_ptr<block> b);
-        // std::string get_txn_name() const;
-
-        // static int txn_no;
 };
 
 #endif
