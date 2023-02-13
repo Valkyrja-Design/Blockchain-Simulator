@@ -1,7 +1,7 @@
 #include "peer.h"
 #include <iostream>
 
-int peer::peer_no = 0;
+int peer::peer_no = -1;
 
 void peer::add_neighbor(std::shared_ptr<peer> p){
     neighbors[p->id] = {p, std::set<int>()};

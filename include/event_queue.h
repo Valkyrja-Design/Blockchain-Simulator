@@ -5,7 +5,7 @@
 #include <set>
 
 class event_queue{
-    private:
+    public:
         std::set<event> queue;
 
     public:

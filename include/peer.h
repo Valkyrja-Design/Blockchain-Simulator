@@ -1,12 +1,11 @@
 #ifndef _PEER_H
 #define _PEER_H
-
 #include <vector>
 #include <memory>
+#include <string>
 #include <map>
-#include <set>
 
-#include "transaction.h"
+#include "block.h"
 
 enum speed {SLOW, FAST};
 enum cpu_power {LOW, HIGH};
@@ -19,10 +18,13 @@ class peer{
         int coins;
 
     public:
-
         // maps peer_id to peer and set of txns forwarded to that peer
         std::map<int, std::pair<std::shared_ptr<peer>, std::set<int>>> neighbors;   
         std::map<int, std::shared_ptr<transaction>> txn_pool;
+        std::vector<int> peer_coins; //coins of every peer
+        std::shared_ptr<block> genesis_block;
+        std::shared_ptr<block> cur_block;     //his current valid block
+
 
         peer(int coins)
             : coins(coins) {}
@@ -38,6 +40,8 @@ class peer{
 
         void set_label1(speed label1){ this->label1 = label1; }
         void set_label2(cpu_power label2){ this->label2 = label2; }
+        speed get_label1(){ return this->label1; }
+        cpu_power get_label2(){ return this->label2; }
         void add_coins(int addend){ coins += addend; }
 
         void add_neighbor(std::shared_ptr<peer> p);

@@ -30,7 +30,8 @@ std::vector<int> genshuf(int m, int n){
     }
     std::sort(x.begin(), x.begin()+m);
     
-    return x;
+    std::vector<int> first_m(x.begin(), x.begin() + m);
+    return first_m;
 }
 
 

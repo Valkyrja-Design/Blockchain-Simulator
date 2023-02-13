@@ -1,7 +1,8 @@
 #ifndef _EVENT_H
 #define _EVENT_H
 
-enum event_type {TXN_GEN, TXN_GET};
+#include "block.h"
+enum event_type {TXN_GEN, TXN_GET, BLK_GEN, BLK_GET};
 
 struct event{
     event_type type;
@@ -10,6 +11,9 @@ struct event{
     // use in case of TXN_GET 
     int from_peer;
     int txn_id;
+
+    //for block gen
+    block* blk;
 
     int peer_id;
 

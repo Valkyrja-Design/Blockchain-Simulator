@@ -1,0 +1,32 @@
+[
+{
+  "directory": "/mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator",
+  "command": "/usr/bin/c++   -I/mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator/./include    -std=gnu++17 -o CMakeFiles/simulator.dir/src/block.cpp.o -c /mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator/src/block.cpp",
+  "file": "/mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator/src/block.cpp"
+},
+{
+  "directory": "/mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator",
+  "command": "/usr/bin/c++   -I/mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator/./include    -std=gnu++17 -o CMakeFiles/simulator.dir/src/event_queue.cpp.o -c /mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator/src/event_queue.cpp",
+  "file": "/mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator/src/event_queue.cpp"
+},
+{
+  "directory": "/mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator",
+  "command": "/usr/bin/c++   -I/mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator/./include    -std=gnu++17 -o CMakeFiles/simulator.dir/src/main.cpp.o -c /mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator/src/main.cpp",
+  "file": "/mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator/src/main.cpp"
+},
+{
+  "directory": "/mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator",
+  "command": "/usr/bin/c++   -I/mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator/./include    -std=gnu++17 -o CMakeFiles/simulator.dir/src/peer.cpp.o -c /mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator/src/peer.cpp",
+  "file": "/mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator/src/peer.cpp"
+},
+{
+  "directory": "/mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator",
+  "command": "/usr/bin/c++   -I/mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator/./include    -std=gnu++17 -o CMakeFiles/simulator.dir/src/simulator.cpp.o -c /mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator/src/simulator.cpp",
+  "file": "/mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator/src/simulator.cpp"
+},
+{
+  "directory": "/mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator",
+  "command": "/usr/bin/c++   -I/mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator/./include    -std=gnu++17 -o CMakeFiles/simulator.dir/src/transaction.cpp.o -c /mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator/src/transaction.cpp",
+  "file": "/mnt/d/Sem6/CS765/Ass1/Blockchain-Simulator/src/transaction.cpp"
+}
+]

@@ -2,3 +2,5 @@ build/
 trace 
 simulator
 .vscode
+CMakeFiles
+*.cmake
