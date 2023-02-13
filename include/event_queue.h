@@ -6,7 +6,7 @@
 
 class event_queue{
     private:
-        std::set<event> queue;
+        std::multiset<event> queue;
 
     public:
         void push(const event& e);

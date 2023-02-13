@@ -5,20 +5,26 @@
 #include <vector>
 #include <algorithm>
 
-std::default_random_engine generator;
+static std::default_random_engine generator;
 
-int randint(int l, int r){
+inline static int randint(int l, int r){
+    
     std::uniform_int_distribution<int> distribution(l, r);
     return distribution(generator);
 }
 
-double randexp(double lambda){
+inline static double randexp(double lambda){
     std::exponential_distribution<double> distribution(lambda);
     return distribution(generator);
 }
 
+inline static double randreal(double a, double b){
+    std::uniform_real_distribution<double> distribution(a, b);
+    return distribution(generator);
+}
+
 // select m random indices of n
-std::vector<int> genshuf(int m, int n){    
+static std::vector<int> genshuf(int m, int n){    
     int i,j;
     std::vector<int> x(n);
 
@@ -32,7 +38,5 @@ std::vector<int> genshuf(int m, int n){
     
     return x;
 }
-
-
 
 #endif
