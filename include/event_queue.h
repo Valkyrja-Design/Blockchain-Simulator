@@ -11,6 +11,7 @@ class event_queue{
     public:
         void push(const event& e);
         event pop();
+        bool empty() const { return queue.empty(); }
 
 };
 

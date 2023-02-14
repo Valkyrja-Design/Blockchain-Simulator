@@ -3,26 +3,33 @@
 
 #include "block.h"
 
+#include <map>
+
 class blockchain{
     public:
         int len;
-        std::shared_ptr<block> genesis_block;
-        std::vector<std::shared_ptr<block>> chain;
-        std::vector<std::shared_ptr<block>> buffer;             // temporary pool
+        std::shared_ptr<block> genesis_block;               // root of tree
+        std::shared_ptr<block> head;                        // head of Longest Chain
+        std::map<int, std::shared_ptr<block>> added_blocks; // blocks already added
+        std::map<int, std::shared_ptr<block>> buffer;
+        std::map<int, std::vector<std::shared_ptr<block>>> children;           // children of a block
 
-        blockchain(std::shared_ptr<block> genesis) : len(1), genesis_block(genesis) {}
+        blockchain(std::shared_ptr<block> genesis) : len(1), genesis_block(genesis), head(genesis) {}
 
-        void add_block(std::shared_ptr<block> blk,
-                        std::unique_ptr<std::vector<long long>>& peer_coins);       // add a block to the blockchain if possible
-        // #blocks we can add from buffer starting at prev_id
-        int count_from_buffer(int prev_id) const;                        
-        // check if adding a block made buffered blocks ready
-        void add_from_buffer(std::shared_ptr<block> blk, std::unique_ptr<std::vector<long long>>& peer_coins);            
-        void update_peer_coins(std::shared_ptr<block> blk, std::unique_ptr<std::vector<long long>>& peer_coins) const;
+        bool blk_exists(int blk_id) const;
+        void add_child(int blk_id, std::shared_ptr<block> child);
+        void add_block(std::shared_ptr<block> blk, std::unique_ptr<std::vector<long long>>& peer_coins);
+        void add_from_buffer(std::unique_ptr<std::vector<long long>>& peer_coins, bool cash);
+        void orphan_chain(std::shared_ptr<block> head
+                        , std::shared_ptr<block> tail
+                        , std::unique_ptr<std::vector<long long>>& peer_coins);
+        void cash_blk(std::shared_ptr<block> blk, std::unique_ptr<std::vector<long long>>& peer_coins) const;
+        void revert_blk(std::shared_ptr<block> blk, std::unique_ptr<std::vector<long long>>& peer_coins) const;
+        std::pair<int, int> count_from_buffer(int blk_id);
 
-        int get_curr_BlkID() const { return chain.empty() ? genesis_block->BlkID : chain.back()->BlkID; };
+        int get_curr_BlkID() const { return head->BlkID; }
 
-        void print_blockchain() const;
+        void print_blockchain();
 };
 
 

@@ -17,9 +17,9 @@ class block{
         std::vector<std::shared_ptr<transaction>> txns;      
         std::unique_ptr<transaction> coinbase;              // included in every mined block
 
-        block(int prev_BlkID)
+        block(int prev_id)
             : BlkID(++block::block_id)
-            , prev_BlkID(prev_BlkID)
+            , prev_BlkID(prev_id)
             , block_size(0) {}
 
         void add_coinbase(int peer_id);

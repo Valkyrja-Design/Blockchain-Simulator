@@ -16,6 +16,7 @@ class simulator{
         double blk_inter_arrival_time;
         double high_hk;                                 // hashing fraction of high cpu node
         double low_hk;                                 // hashing fraction of low cpu node
+        int max_blocks;
         int mining_fee;
 
         double curr_time;

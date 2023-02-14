@@ -6,7 +6,7 @@
 #include "transaction.h"
 #include "block.h"
 
-enum event_type {TXN_GEN, TXN_GET, BLK_GEN, BLK_GET, BLK_MINE};
+enum event_type {TXN_GEN, TXN_GET, BLK_GET, BLK_MINE};
 
 struct event{
     event_type type;

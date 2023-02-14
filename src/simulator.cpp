@@ -16,6 +16,8 @@ void simulator::initialize(){
     high_hk=10/(n*z1+n*(1-z1)*10);
     low_hk=1/(n*z1+n*(1-z1)*10);
 
+    std::cout<<high_hk<<" "<<low_hk<<"\n";
+    
     std::vector<long long> p_coins;
 
     auto genesis_blk = std::make_shared<block>(-1);
@@ -166,28 +168,26 @@ void simulator::start(){
         event e2{event_type::BLK_MINE, ts};
         e2.peer_id = i;
         peers[i]->gen_blk();
-        std::cout<<"BLK_MINE_SCHEDULED at "<<ts<<" on Peer "<<i<<"\n";
+        // std::cout<<"BLK_MINE_SCHEDULED at "<<ts<<" on Peer "<<i<<"\n";
         e2.blk = peers[i]->mining_blk;
         e_queue.push(e2);
 
-        // Block generate 
-        event e3{event_type::BLK_GEN, blk_inter_arrival_time};
-        e3.peer_id = i;
-        e_queue.push(e3);
     }
 
-    std::cout<<block::block_id<<"\n";
+    bool process_remain = false;
 
-    while (curr_time <= simulation_time){
-        std::cout<<std::string(10, '-')<<"\n";
+    while (curr_time <= simulation_time || process_remain){
+        if (e_queue.empty()) break;
+
+        // std::cout<<std::string(10, '-')<<"\n";
         auto e = e_queue.pop();
         curr_time = e.time_stamp;
-        std::cout<<"CURRENT TIME : "<<curr_time<<"\n";
-        std::cout<<std::string(10, '-')<<"\n";
-        std::cout<<"Next Event is ";
+        // std::cout<<"CURRENT TIME : "<<curr_time<<"\n";
+        // std::cout<<std::string(10, '-')<<"\n";
+        // std::cout<<"Next Event is ";
 
-        if (e.type == event_type::TXN_GEN){
-            std::cout<<"TXN_GEN at "<<e.peer_id<<", Txn";
+        if (e.type == event_type::TXN_GEN && !process_remain){
+            // std::cout<<"TXN_GEN at "<<e.peer_id<<", Txn";
 
             int txn_id = peers[e.peer_id]->gen_txn();
 
@@ -218,12 +218,12 @@ void simulator::start(){
                 e_queue.push(next_event);
             }         
         } else if (e.type == event_type::TXN_GET){
-            std::cout<<"TXN_GET at "<<e.peer_id<<", Txn"<<e.txn_id<<" from "<<e.from_peer<<"\n";
+            // std::cout<<"TXN_GET at "<<e.peer_id<<", Txn"<<e.txn_id<<" from "<<e.from_peer<<"\n";
             auto txn = e.txn;
             
             // verify txn
             if (peers[e.peer_id]->verify_txn(txn)){
-                std::cout<<"Peer "<<e.peer_id<<" :: Txn valid, forwarding to peers...\n";
+                // std::cout<<"Peer "<<e.peer_id<<" :: Txn valid, forwarding to peers...\n";
 
                 peers[e.peer_id]->add_txn(txn);
 
@@ -245,22 +245,20 @@ void simulator::start(){
                 }    
                 
             } else{
-                std::cout<<"Peer "<<e.peer_id<<" :: Invalid Txn\n";
+                // std::cout<<"Peer "<<e.peer_id<<" :: Invalid Txn\n";
             }
-        } else if (e.type == event_type::BLK_MINE){
+        } else if (e.type == event_type::BLK_MINE && !process_remain){
             std::cout<<"BLK_MINE at "<<e.peer_id<<", Blk"<<e.blk->BlkID<<"\n";
+
             if (!peers[e.peer_id]->verify_chain(e.blk->prev_BlkID)){
                 std::cout<<"Peer "<<e.peer_id<<" :: Longest chain not same as before. Aborting event...\n";
             } else{
                 std::cout<<"Peer "<<e.peer_id<<" :: Longest chain same. Broadcasting block...\n";
-                
-                for (int i=0;i<n;i++){
-                    std::cout<<"i = "<<i<<" "<<(*peer_coins)[i]<<"\n";
-                }
-                e.blk->print_blk();
 
                 // add block to blockchain
                 peers[e.peer_id]->add_block(e.blk);
+                std::cout<<std::string(30, '-')<<"\n";
+                std::cout<<"Peer "<<e.peer_id<<"\n";
                 peers[e.peer_id]->blkchain->print_blockchain();
 
                 // broadcast to neighbors
@@ -279,21 +277,29 @@ void simulator::start(){
 
                     e_queue.push(next_event);
                 }    
+
+                double ts = randexp((peers[e.peer_id]->get_label2() == cpu_power::HIGH ? high_hk : low_hk)/blk_inter_arrival_time);
+                // Block mined 
+                event e2{event_type::BLK_MINE, curr_time + ts};
+                e2.peer_id = e.peer_id;
+                peers[e.peer_id]->gen_blk();
+                std::cout<<"BLK_MINE_SCHEDULED at "<<curr_time + ts<<" on Peer "<<e.peer_id<<" Blk"<<peers[e.peer_id]->mining_blk->BlkID<<"\n";
+                e2.blk = peers[e.peer_id]->mining_blk;
+                e_queue.push(e2);
             }
+
         } else if (e.type == event_type::BLK_GET){
             std::cout<<"BLK_GET at "<<e.peer_id<<" , Blk"<<e.blk->BlkID<<" from "<<e.from_peer<<"\n";
-            
-            for (int i=0;i<n;i++){
-                    std::cout<<"i = "<<i<<" "<<(*peer_coins)[i]<<"\n";
-                }
-                
-            e.blk->print_blk();
 
             if (peers[e.peer_id]->verify_block(e.blk)){
                 std::cout<<"Peer "<<e.peer_id<<" :: Block valid, forwarding to peers...\n";
 
                 // add block to blockchain
+                int prev_id = peers[e.peer_id]->blkchain->get_curr_BlkID();
                 peers[e.peer_id]->add_block(e.blk);
+                int new_id = peers[e.peer_id]->blkchain->get_curr_BlkID();
+                std::cout<<std::string(30, '-')<<"\n";
+                std::cout<<"Peer "<<e.peer_id<<"\n";
                 peers[e.peer_id]->blkchain->print_blockchain();
 
                 for (auto u : adj[e.peer_id]){
@@ -312,25 +318,31 @@ void simulator::start(){
 
                     e_queue.push(next_event);
                 }    
+
+                // start mining again only if new chain is created
+                if (prev_id != new_id && !process_remain){
+                    double ts = randexp((peers[e.peer_id]->get_label2() == cpu_power::HIGH ? high_hk : low_hk)/blk_inter_arrival_time);
+                    // Block mined 
+                    event e2{event_type::BLK_MINE, curr_time + ts};
+                    e2.peer_id = e.peer_id;
+                    peers[e.peer_id]->gen_blk();
+                    std::cout<<"BLK_MINE_SCHEDULED at "<<curr_time + ts<<" on Peer "<<e.peer_id<<" Blk"<<peers[e.peer_id]->mining_blk->BlkID<<"\n";
+                    e2.blk = peers[e.peer_id]->mining_blk;
+                    e_queue.push(e2);
+                }
                 
             } else{
                 std::cout<<"Peer "<<e.peer_id<<" :: Invalid Block\n";
+                std::cout<<std::string(30, '-')<<"\n";
+                std::cout<<"Peer "<<e.peer_id<<"\n";
+                peers[e.peer_id]->blkchain->print_blockchain();
             }
-        } else if (e.type == BLK_GEN){
-            std::cout<<"BLK_GEN at "<<e.peer_id<<", Blk";
+        } 
 
-            // Block mine
-            event e1{event_type::BLK_MINE, curr_time+randexp((peers[e.peer_id]->get_label2() == cpu_power::HIGH ? high_hk : low_hk)/blk_inter_arrival_time)};
-            e1.peer_id = e.peer_id;
-            peers[e.peer_id]->gen_blk();
-            e1.blk = peers[e.peer_id]->mining_blk;
-            std::cout<<e1.blk->BlkID<<"\n";
-            e_queue.push(e1);
-
-            // Block generate 
-            event e2{event_type::BLK_GEN, curr_time+blk_inter_arrival_time};
-            e2.peer_id = e.peer_id;
-            e_queue.push(e2);
+        // process remaining events ignoring GEN events 
+        if (curr_time > simulation_time || max_blocks <= block::block_id){
+            process_remain = true;
         }
     }
+
 }
