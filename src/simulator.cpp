@@ -16,7 +16,8 @@ void simulator::initialize(){
     high_hk=10/(n*z1+n*(1-z1)*10);
     low_hk=1/(n*z1+n*(1-z1)*10);
 
-    peer_coins = std::make_shared<std::vector<int>>();
+    std::vector<long long> p_coins;
+
     auto genesis_blk = std::make_shared<block>(-1);
 
     for (int i=0;i<n;i++){
@@ -26,9 +27,14 @@ void simulator::initialize(){
             , cpu_power::HIGH
             , coins));
 
-        peer_coins->emplace_back(coins);
-        peers[i]->peer_coins = peer_coins;
+        p_coins.emplace_back(coins);
         peers[i]->blkchain = std::make_unique<blockchain>(genesis_blk);
+    }
+
+    peer_coins = std::make_unique<std::vector<long long>>(p_coins);
+
+    for (int i=0;i<n;i++){
+        peers[i]->peer_coins = std::make_unique<std::vector<long long>>(p_coins);
     }
 
     // set random peers to "slow" and "low cpu"
@@ -155,10 +161,12 @@ void simulator::start(){
         e1.peer_id = i;
         e_queue.push(e1);
 
+        double ts = randexp((peers[i]->get_label2() == cpu_power::HIGH ? high_hk : low_hk)/blk_inter_arrival_time);
         // Block mined 
-        event e2{event_type::BLK_MINE, randexp((peers[i]->get_label2() == cpu_power::HIGH ? high_hk : low_hk)/blk_inter_arrival_time)};
+        event e2{event_type::BLK_MINE, ts};
         e2.peer_id = i;
         peers[i]->gen_blk();
+        std::cout<<"BLK_MINE_SCHEDULED at "<<ts<<" on Peer "<<i<<"\n";
         e2.blk = peers[i]->mining_blk;
         e_queue.push(e2);
 
@@ -182,7 +190,8 @@ void simulator::start(){
             std::cout<<"TXN_GEN at "<<e.peer_id<<", Txn";
 
             int txn_id = peers[e.peer_id]->gen_txn();
-            std::cout<<txn_id<<"\n";
+
+            // std::cout<<txn_id<<"\n";
 
             // GEN triggers another GEN after interarrival time
             double time_stamp = curr_time+randexp(1.0/Ttx);
@@ -190,6 +199,8 @@ void simulator::start(){
             next_event.peer_id = e.peer_id;
             e_queue.push(next_event);
 
+            if (txn_id == -1) continue;
+            
             // forward to neighbors
             for (auto u : adj[e.peer_id]){
 
@@ -243,6 +254,11 @@ void simulator::start(){
             } else{
                 std::cout<<"Peer "<<e.peer_id<<" :: Longest chain same. Broadcasting block...\n";
                 
+                for (int i=0;i<n;i++){
+                    std::cout<<"i = "<<i<<" "<<(*peer_coins)[i]<<"\n";
+                }
+                e.blk->print_blk();
+
                 // add block to blockchain
                 peers[e.peer_id]->add_block(e.blk);
                 peers[e.peer_id]->blkchain->print_blockchain();
@@ -266,6 +282,12 @@ void simulator::start(){
             }
         } else if (e.type == event_type::BLK_GET){
             std::cout<<"BLK_GET at "<<e.peer_id<<" , Blk"<<e.blk->BlkID<<" from "<<e.from_peer<<"\n";
+            
+            for (int i=0;i<n;i++){
+                    std::cout<<"i = "<<i<<" "<<(*peer_coins)[i]<<"\n";
+                }
+                
+            e.blk->print_blk();
 
             if (peers[e.peer_id]->verify_block(e.blk)){
                 std::cout<<"Peer "<<e.peer_id<<" :: Block valid, forwarding to peers...\n";

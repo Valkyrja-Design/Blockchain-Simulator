@@ -2,12 +2,12 @@
 
 #include <iostream>
 
-void blockchain::add_block(std::shared_ptr<block> blk, std::shared_ptr<std::vector<int>> peer_coins){
+void blockchain::add_block(std::shared_ptr<block> blk, std::unique_ptr<std::vector<long long>>& peer_coins){
     // get the length of longest chain on adding this block
     int llc = 1;
     int idx = -1;
     if (blk->prev_BlkID == genesis_block->BlkID){
-        llc = 1 + count_from_buffer(blk->BlkID);
+        llc += 1 + count_from_buffer(blk->BlkID);
     } else {
         for (int i=0;i<chain.size();i++){
             if (chain[i]->BlkID == blk->prev_BlkID){
@@ -20,7 +20,7 @@ void blockchain::add_block(std::shared_ptr<block> blk, std::shared_ptr<std::vect
         }
     }
     
-    if (llc == 1){                  // this means this block's prev_block hasn't arrived yet so add to buffer and return
+    if (llc == 1){                           // this means this block's prev_block hasn't arrived yet so add to buffer and return
         buffer.emplace_back(blk);
         return;
     }
@@ -34,7 +34,7 @@ void blockchain::add_block(std::shared_ptr<block> blk, std::shared_ptr<std::vect
     } 
 }
 
-void blockchain::add_from_buffer(std::shared_ptr<block> blk, std::shared_ptr<std::vector<int>> peer_coins){
+void blockchain::add_from_buffer(std::shared_ptr<block> blk, std::unique_ptr<std::vector<long long>>& peer_coins){
     for (auto it = buffer.begin(); it != buffer.end(); ++it){
         if ((*it)->prev_BlkID == blk->BlkID){
             chain.emplace_back(*it);
@@ -62,7 +62,7 @@ int blockchain::count_from_buffer(int prev_id) const {
     }
 }
 
-void blockchain::update_peer_coins(std::shared_ptr<block> blk, std::shared_ptr<std::vector<int>> peer_coins) const {
+void blockchain::update_peer_coins(std::shared_ptr<block> blk, std::unique_ptr<std::vector<long long>>& peer_coins) const {
     (*peer_coins)[blk->coinbase->id_x] += blk->coinbase->C;
     for (const auto& txn : blk->txns){
         (*peer_coins)[txn->id_x] -= txn->C;
@@ -79,4 +79,5 @@ void blockchain::print_blockchain() const {
         std::cout<<blk->BlkID;
     }
     std::cout<<"\n";
+    std::cout<<std::string(10, '-')<<"\n";
 }

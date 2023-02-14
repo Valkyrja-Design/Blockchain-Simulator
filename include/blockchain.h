@@ -13,12 +13,12 @@ class blockchain{
         blockchain(std::shared_ptr<block> genesis) : len(1), genesis_block(genesis) {}
 
         void add_block(std::shared_ptr<block> blk,
-                        std::shared_ptr<std::vector<int>> peer_coins);       // add a block to the blockchain if possible
+                        std::unique_ptr<std::vector<long long>>& peer_coins);       // add a block to the blockchain if possible
         // #blocks we can add from buffer starting at prev_id
         int count_from_buffer(int prev_id) const;                        
         // check if adding a block made buffered blocks ready
-        void add_from_buffer(std::shared_ptr<block> blk, std::shared_ptr<std::vector<int>> peer_coins);            
-        void update_peer_coins(std::shared_ptr<block> blk, std::shared_ptr<std::vector<int>> peer_coins) const;
+        void add_from_buffer(std::shared_ptr<block> blk, std::unique_ptr<std::vector<long long>>& peer_coins);            
+        void update_peer_coins(std::shared_ptr<block> blk, std::unique_ptr<std::vector<long long>>& peer_coins) const;
 
         int get_curr_BlkID() const { return chain.empty() ? genesis_block->BlkID : chain.back()->BlkID; };
 

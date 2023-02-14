@@ -25,6 +25,8 @@ class block{
         void add_coinbase(int peer_id);
         bool add_txn(std::shared_ptr<transaction> txn);
         
+        void print_blk() const;
+        
         static int block_id;
 };
 

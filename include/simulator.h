@@ -24,7 +24,7 @@ class simulator{
         std::vector<std::vector<int>> adj;              // adjacency list of network graph
         std::vector<std::vector<double>> rho;              // speed of light propagation delays
         std::vector<std::vector<int>> link_speeds;       
-        std::shared_ptr<std::vector<int>> peer_coins;
+        std::unique_ptr<std::vector<long long>> peer_coins;
 
         event_queue e_queue;
 

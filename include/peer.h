@@ -25,7 +25,7 @@ class peer{
         std::map<int, std::pair<std::shared_ptr<peer>, std::set<int>>> neighbors;   
         std::map<int, std::set<int>> blks_frwded;                       // blocks forwarded to this neighbor peer
         std::map<int, std::shared_ptr<transaction>> txn_pool;
-        std::shared_ptr<std::vector<int>> peer_coins;
+        std::unique_ptr<std::vector<long long>> peer_coins;
         std::unique_ptr<blockchain> blkchain;                           // blockchain corresponding to this peer
         std::shared_ptr<block> mining_blk;                                // current block begin mined
 

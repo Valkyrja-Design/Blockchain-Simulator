@@ -18,7 +18,7 @@ class transaction{
                 : txn_id(++transaction::txn_no), id_x(id_x), id_y(id_y), C(coins), is_coinbase(false) {}
 
         transaction(int id_x, int mining_fee)           // coinbase 
-                : txn_id(++transaction::txn_no), C(mining_fee), is_coinbase(true) {}
+                : txn_id(++transaction::txn_no), id_x(id_x), C(mining_fee), is_coinbase(true) {}
 
         std::string get_txn_name() const;
 
