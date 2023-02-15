@@ -8,4 +8,4 @@ all:
 	g++ ${SOURCES} ${CFLAGS} -o ${OUTFILE}
 
 clean:
-	rm simulator stats trace edges
+	rm simulator stats trace edges data

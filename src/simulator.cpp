@@ -17,8 +17,6 @@ void simulator::initialize(){
     high_hk=10/(n*z1+n*(1-z1)*10);
     low_hk=1/(n*z1+n*(1-z1)*10);
 
-    // std::cout<<high_hk<<" "<<low_hk<<"\n";
-
     std::vector<long long> p_coins;
 
     auto genesis_blk = std::make_shared<block>(-1);
@@ -122,20 +120,17 @@ void simulator::initialize(){
     }
 
     for (int i=0;i<n;i++){
-        // std::cout<<"Neighbors of "<<i<<" : ";
         rho[i].assign(n, 0);
         link_speeds[i].resize(n);
 
         for (int j : adj[i]){
             peers[i]->add_neighbor(peers[j]);
-            // std::cout<<j<<", ";
             if (rho[j].empty())                            
                 rho[i][j] = randreal(0.01, 0.5);              // random real number between 10ms and 500ms
 
             link_speeds[i][j] = peers[i]->get_label1() == speed::FAST && peers[j]->get_label1() == speed::FAST ? 100 : 5;
 
         }   
-        // std::cout<<"\n";
     }
 
 }
@@ -178,7 +173,6 @@ void simulator::start(){
         event e2{event_type::BLK_MINE, ts};
         e2.peer_id = i;
         peers[i]->gen_blk();
-        // std::cout<<"BLK_MINE_SCHEDULED at "<<ts<<" on Peer "<<i<<"\n";
         e2.blk = peers[i]->mining_blk;
         e_queue.push(e2);
 
@@ -189,19 +183,11 @@ void simulator::start(){
     while (curr_time <= simulation_time || process_remain){
         if (e_queue.empty()) break;
 
-        // std::cout<<std::string(10, '-')<<"\n";
         auto e = e_queue.pop();
         curr_time = e.time_stamp;
-        // std::cout<<"CURRENT TIME : "<<curr_time<<"\n";
-        // std::cout<<std::string(10, '-')<<"\n";
-        // std::cout<<"Next Event is ";
 
         if (e.type == event_type::TXN_GEN && !process_remain){
-            // std::cout<<"TXN_GEN at "<<e.peer_id<<", Txn";
-
             int txn_id = peers[e.peer_id]->gen_txn();
-
-            // std::cout<<txn_id<<"\n";
 
             // GEN triggers another GEN after interarrival time
             double time_stamp = curr_time + peers[e.peer_id]->txn_iat(generator);
@@ -228,7 +214,6 @@ void simulator::start(){
                 e_queue.push(next_event);
             }         
         } else if (e.type == event_type::TXN_GET){
-            // std::cout<<"TXN_GET at "<<e.peer_id<<", Txn"<<e.txn_id<<" from "<<e.from_peer<<"\n";
             auto txn = e.txn;
 
             if (peers[e.peer_id]->txn_pool.count(txn->txn_id)){
@@ -237,7 +222,6 @@ void simulator::start(){
             
             // verify txn
             if (peers[e.peer_id]->verify_txn(txn)){
-                // std::cout<<"Peer "<<e.peer_id<<" :: Txn valid, forwarding to peers...\n";
 
                 peers[e.peer_id]->add_txn(txn);
 
@@ -262,7 +246,6 @@ void simulator::start(){
                 // std::cout<<"Peer "<<e.peer_id<<" :: Invalid Txn\n";
             }
         } else if (e.type == event_type::BLK_MINE && !process_remain){
-            // std::cout<<"BLK_MINE at "<<e.peer_id<<", Blk"<<e.blk->BlkID<<"\n";
 
             if (!peers[e.peer_id]->verify_chain(e.blk->prev_BlkID)){
                 // std::cout<<"Peer "<<e.peer_id<<" :: Longest chain not same as before. Aborting event...\n";
@@ -273,15 +256,9 @@ void simulator::start(){
 
                 // add block to blockchain and forward added blocks
                 auto blocks = peers[e.peer_id]->add_block(e.blk, curr_time);
-                // std::cout<<std::string(30, '-')<<"\n";
-                // std::cout<<"Peer "<<e.peer_id<<"\n";
-                // peers[e.peer_id]->blkchain->print_blockchain();
-
-                // std::cout<<"Peer "<<e.peer_id<<" :: Broadcasting blocks: \n";
-
+                
                 // broadcast to neighbors
                 for (auto frwd_block : blocks){
-                    // std::cout<<"Blk"<<frwd_block->BlkID<<", ";
                     for (auto u : adj[e.peer_id]){
 
                         double d_ij = 96*1e-3/(double)link_speeds[e.peer_id][u];
@@ -300,14 +277,11 @@ void simulator::start(){
                     }  
                 }  
 
-                // std::cout<<"\n";
-
                 double ts = peers[e.peer_id]->mining_time(generator);
                 // Block mined 
                 event e2{event_type::BLK_MINE, curr_time + ts};
                 e2.peer_id = e.peer_id;
                 peers[e.peer_id]->gen_blk();
-                // std::cout<<"BLK_MINE_SCHEDULED at "<<curr_time + ts<<" on Peer "<<e.peer_id<<" Blk"<<peers[e.peer_id]->mining_blk->BlkID<<"\n";
                 e2.blk = peers[e.peer_id]->mining_blk;
                 e_queue.push(e2);
             }
@@ -316,19 +290,12 @@ void simulator::start(){
 
             if (peers[e.peer_id]->blkchain->blk_exists(e.blk->BlkID)) continue;
 
-            // std::cout<<"BLK_GET at "<<e.peer_id<<" , Blk"<<e.blk->BlkID<<" from "<<e.from_peer<<"\n";
-
             if (peers[e.peer_id]->verify_block(e.blk)){
 
                 // add block to blockchain
                 int prev_id = peers[e.peer_id]->blkchain->get_curr_BlkID();
                 auto blocks = peers[e.peer_id]->add_block(e.blk, curr_time);
                 int new_id = peers[e.peer_id]->blkchain->get_curr_BlkID();
-                // std::cout<<std::string(30, '-')<<"\n";
-                // std::cout<<"Peer "<<e.peer_id<<"\n";
-                // peers[e.peer_id]->blkchain->print_blockchain();
-
-                // std::cout<<"Peer "<<e.peer_id<<" :: Block valid, forwarding blocks: \n";
 
                 for (auto frwd_block : blocks){
                     // std::cout<<"Blk"<<frwd_block->BlkID<<", ";
@@ -350,7 +317,6 @@ void simulator::start(){
                         e_queue.push(next_event);
                     }   
                 } 
-                // std::cout<<"\n";
 
                 // start mining again only if new chain is created
                 if (prev_id != new_id && !process_remain){
@@ -359,7 +325,6 @@ void simulator::start(){
                     event e2{event_type::BLK_MINE, curr_time + ts};
                     e2.peer_id = e.peer_id;
                     peers[e.peer_id]->gen_blk();
-                    // std::cout<<"BLK_MINE_SCHEDULED at "<<curr_time + ts<<" on Peer "<<e.peer_id<<" Blk"<<peers[e.peer_id]->mining_blk->BlkID<<"\n";
                     e2.blk = peers[e.peer_id]->mining_blk;
                     e_queue.push(e2);
                 }
@@ -406,7 +371,7 @@ void simulator::dump_edges(){
 
 void simulator::dump_stats(){
     std::fstream file(stats_file, std::ios::out | std::ios::binary);
-    // std::fstream data("data", std::ios::out | std::ios::binary);
+    std::fstream data("data", std::ios::out | std::ios::binary);
 
     if (file.is_open()){
         int slow_low_cnt = 0;
@@ -466,24 +431,30 @@ void simulator::dump_stats(){
         for (int i=0;i<n;i++){
             double ratio = peers[i]->blks_generated == 0 ? 0 : ((double)peers[i]->blkchain->get_owner_blks())/(peers[i]->blks_generated);
             file << "Peer "<<i<<" Fraction of my blocks in Longest Chain "<<ratio<<"\n";
-            // data << "Hash_Power "<< i << " " << (peers[i]->get_label2() == cpu_power::LOW ? low_hk : high_hk) << "\n";
+            
+            if (visualize)
+                data << "Hash_Power "<< i << " " << (peers[i]->get_label2() == cpu_power::LOW ? low_hk : high_hk) << "\n";
 
             if (peers[i]->get_label1() == speed::SLOW && peers[i]->get_label2() == cpu_power::LOW){
                 slow_low_cnt++;
                 slow_low_ratio += ratio;
-                // data << "SL " << i << " "<< ratio << "\n";
+                if (visualize)
+                    data << "SL " << i << " "<< ratio << "\n";
             } else if (peers[i]->get_label1() == speed::SLOW && peers[i]->get_label2() == cpu_power::HIGH){
                 slow_high_cnt++;
                 slow_high_ratio += ratio;
-                // data << "SH " << i << " " << ratio << "\n";
+                if (visualize)
+                    data << "SH " << i << " " << ratio << "\n";
             } else if (peers[i]->get_label1() == speed::FAST && peers[i]->get_label2() == cpu_power::LOW){
                 fast_low_cnt++;
                 fast_low_ratio += ratio;
-                // data << "FL " << i << " " << ratio << "\n";
+                if (visualize)
+                    data << "FL " << i << " " << ratio << "\n";
             } else if (peers[i]->get_label1() == speed::FAST && peers[i]->get_label2() == cpu_power::HIGH){
                 fast_high_cnt++;
                 fast_high_ratio += ratio;
-                // data << "FH " << i << " " << ratio << "\n";
+                if (visualize)
+                    data << "FH " << i << " " << ratio << "\n";
             } 
         }
         slow_low_ratio /= slow_low_cnt == 0 ? -1 : slow_low_cnt;

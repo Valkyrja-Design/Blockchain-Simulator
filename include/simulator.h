@@ -22,13 +22,15 @@ class simulator{
         std::string trace_file;
         std::string graph_file;
         std::string stats_file;
+        std::string visual_file;
+        bool visualize;
 
         double curr_time;
 
         std::vector<std::shared_ptr<peer>> peers;       // peers in the network
         std::vector<std::vector<int>> adj;              // adjacency list of network graph
-        std::vector<std::vector<double>> rho;              // speed of light propagation delays
-        std::vector<std::vector<int>> link_speeds;       
+        std::vector<std::vector<double>> rho;           // speed of light propagation delays
+        std::vector<std::vector<int>> link_speeds;      // c_ij's
         std::unique_ptr<std::vector<long long>> peer_coins;
 
         event_queue e_queue;

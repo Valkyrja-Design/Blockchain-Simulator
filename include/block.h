@@ -12,7 +12,7 @@ class block{
     public:
         int BlkID;
         int prev_BlkID;                                     // ID of prev block in blockchain
-        int source;
+        int source;                                         // miner of this block
         int block_size;                                     // block_size  in #txns
         std::vector<std::shared_ptr<transaction>> txns;      
         std::unique_ptr<transaction> coinbase;              // included in every mined block

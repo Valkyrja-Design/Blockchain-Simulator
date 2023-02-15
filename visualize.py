@@ -2,7 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import sys
 
-with open("edges", "r") as file:
+with open(f"{sys.argv[1]}", "r") as file:
     edges = []
     for line in file:
         edge = line.strip().split(' ')
@@ -47,7 +47,7 @@ FH_y = []
 
 Hash_powers = []
 
-with open("data", "r") as file:
+with open(f"{sys.argv[2]}", "r") as file:
     while (True):
         line = file.readline()
         if not line:
@@ -78,4 +78,4 @@ with open("data", "r") as file:
     plt.legend(['SLOW & LOW CPU', 'SLOW & HIGH CPU', 'FAST & LOW CPU', 'FAST & HIGH CPU', 'Hash Powers'])
     plt.xlabel('Peer ID')
     plt.title('Simulation Stats')
-    plt.savefig(f'{sys.argv[1]}.jpeg')
+    plt.savefig(f'{sys.argv[3]}.jpeg')

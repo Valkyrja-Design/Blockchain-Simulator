@@ -10,6 +10,7 @@ int blockchain::get_total_blks() const {
 }
 
 int blockchain::get_owner_blks() {
+    // traverse from head to genesis
     int cnt = head->source == owner;
     int prev_id = head->prev_BlkID;
     while (prev_id != genesis_block->BlkID){
@@ -65,6 +66,7 @@ void blockchain::orphan_chain(std::shared_ptr<block> head
 }
 
 std::pair<int, int> blockchain::count_from_buffer(int blk_id){
+    // max length chain we can get from buffer
     int ret = 0;
     int mx_id = -1;
     for (const auto&[id, blk] : buffer){
@@ -87,10 +89,11 @@ std::vector<int> blockchain::add_from_buffer(std::unique_ptr<std::vector<long lo
                                 , bool cash
                                 , std::map<int, std::shared_ptr<transaction>>& txn_pool
 ){
-    std::vector<int> ids;
+    std::vector<int> ids;   // need ids to forward blocks which were in the buffer till now
     while (true){
         bool flag = false;
         for (auto[id, blk] : buffer){
+            // keep adding blocks from buffer until we find their parent in the current blockchain
             if (added_blocks.count(blk->prev_BlkID)){
                 // add to added_blocks and set child of blk
                 added_blocks[blk->BlkID] = blk;
@@ -129,6 +132,7 @@ std::vector<int> blockchain::add_block(std::shared_ptr<block> blk
         // update balances
         cash_blk(blk, peer_coins, txn_pool);
         auto buff_chain = count_from_buffer(blk->BlkID);
+        
         auto ids = add_from_buffer(peer_coins, true, txn_pool);
         ids.push_back(blk->BlkID);
 

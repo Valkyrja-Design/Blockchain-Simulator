@@ -61,6 +61,16 @@ int main(int argc, char* argv[]){
             .help("name of file to write simulation stats to")
             .default_value((std::string)"stats")
             .action([](const std::string& value) { return value; });
+    
+    program.add_argument("-data", "--data_file")
+            .help("name of file to visualization data to")
+            .default_value((std::string)"data")
+            .action([](const std::string& value) { return value; });
+
+    program.add_argument("-v", "--visualize")
+            .help("produce visualization data")
+            .default_value((bool)false)
+            .implicit_value((bool)true);
 
     try {
         program.parse_args(argc, argv);
@@ -85,6 +95,8 @@ int main(int argc, char* argv[]){
     s.trace_file = program.get<std::string>("-blkchain");
     s.graph_file = program.get<std::string>("-graph");
     s.stats_file = program.get<std::string>("-stats");
+    s.visual_file = program.get<std::string>("-data");
+    s.visualize = program.get<bool>("-v");
     s.initialize();
     s.start();
 }

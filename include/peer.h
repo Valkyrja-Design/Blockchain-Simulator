@@ -22,17 +22,17 @@ class peer{
 
     public:
 
-        int blks_generated = 0;
+        int blks_generated = 0;     // blocks generated from the start of simulation
 
         // maps peer_id to peer and set of txns forwarded to that peer
         std::map<int, std::pair<std::shared_ptr<peer>, std::set<int>>> neighbors;   
         std::map<int, std::set<int>> blks_frwded;                       // blocks forwarded to this neighbor peer
         std::map<int, std::shared_ptr<transaction>> txn_pool;
-        std::unique_ptr<std::vector<long long>> peer_coins;
+        std::unique_ptr<std::vector<long long>> peer_coins;             // coins of other peers
         std::unique_ptr<blockchain> blkchain;                           // blockchain corresponding to this peer
         std::shared_ptr<block> mining_blk;                                // current block begin mined
-        std::exponential_distribution<double> mining_time;
-        std::exponential_distribution<double> txn_iat;
+        std::exponential_distribution<double> mining_time;              // distribution for sampling mining_time
+        std::exponential_distribution<double> txn_iat;                  // distribution for sampling txn interarrival time
 
         peer(int coins)
             : coins(coins) {}
