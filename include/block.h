@@ -12,16 +12,17 @@ class block{
     public:
         int BlkID;
         int prev_BlkID;                                     // ID of prev block in blockchain
-
-        int block_size;                                     // block_size in #txns
+        int source;
+        int block_size;                                     // block_size  in #txns
         std::vector<std::shared_ptr<transaction>> txns;      
         std::unique_ptr<transaction> coinbase;              // included in every mined block
 
         block(int prev_id)
-            : BlkID(++block::block_id)
+            : BlkID(-1)
             , prev_BlkID(prev_id)
             , block_size(0) {}
 
+        void set_id() { BlkID = ++block::block_id; } 
         void add_coinbase(int peer_id);
         bool add_txn(std::shared_ptr<transaction> txn);
         

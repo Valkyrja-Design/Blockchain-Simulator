@@ -19,6 +19,7 @@ struct event{
 
     // use in case of BLK_GET
     std::shared_ptr<block> blk;
+    int source;
 
     int peer_id;
 

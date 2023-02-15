@@ -4,11 +4,12 @@
 #include <random>
 #include <vector>
 #include <algorithm>
+#include <chrono> 
 
-static std::default_random_engine generator;
+static int seed = 32;
+static std::mt19937 generator(seed);
 
 inline static int randint(int l, int r){
-    
     std::uniform_int_distribution<int> distribution(l, r);
     return distribution(generator);
 }

@@ -17,7 +17,8 @@ void peer::add_txn(std::shared_ptr<transaction> txn){
 int peer::gen_txn(){
     if ((*peer_coins)[id] == 0)
         return -1;
-    int coins = randint(1, (*peer_coins)[id]);
+    // int coins = randint(1, (*peer_coins)[id]/);
+    int coins = 1;
     int idx = randint(0, neighbors.size()-1);
     auto it = std::next(neighbors.begin(), idx);
     std::shared_ptr<transaction> txn = std::make_shared<transaction>(id, it->first, coins);
@@ -60,22 +61,32 @@ void peer::gen_blk(){
 
     mining_blk = std::make_shared<block>(blkchain->get_curr_BlkID());
     mining_blk->add_coinbase(id);
+    mining_blk->source = id;
 
-    auto temp_balances = *peer_coins;
+    auto temp_balances = std::vector<long long>(*peer_coins);
 
     // valid block generation
-    for (int i=0;i<txn_pool.size();i++){
-        if (mining_blk->block_size > 1000)
-            return;
+    for (int i=0;i<txn_ids.size();i++){
         auto txn = txn_pool[txn_ids[shuff_idx[i]]];
+
+        if (mining_blk->block_size > 1000 || cnt <= 0)
+            return;
+        // auto txn = txn_pool[txn_ids[shuff_idx[i]]];
+
         if (temp_balances[txn->id_x] >= txn->C){
             mining_blk->add_txn(txn);
             temp_balances[txn->id_x] -= txn->C;
             temp_balances[txn->id_y] += txn->C;
+            cnt--;
         }
     }
 }
 
-void peer::add_block(std::shared_ptr<block> blk){
-    blkchain->add_block(blk, peer_coins);
+std::vector<std::shared_ptr<block>> peer::add_block(std::shared_ptr<block> blk, double arrival){
+    auto ids = blkchain->add_block(blk, peer_coins, txn_pool, arrival);
+    auto ret = std::vector<std::shared_ptr<block>>();
+    for (auto id : ids){
+        ret.emplace_back(blkchain->added_blocks[id]);
+    }
+    return ret;
 }

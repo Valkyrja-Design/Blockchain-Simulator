@@ -17,7 +17,11 @@ class simulator{
         double high_hk;                                 // hashing fraction of high cpu node
         double low_hk;                                 // hashing fraction of low cpu node
         int max_blocks;
+        int max_txns;
         int mining_fee;
+        std::string trace_file;
+        std::string graph_file;
+        std::string stats_file;
 
         double curr_time;
 
@@ -33,6 +37,10 @@ class simulator{
         void initialize();
         bool net_is_connected();
         void start();
+        
+        void dump_trace();
+        void dump_edges();
+        void dump_stats();
 };
 
 #endif
