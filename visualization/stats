@@ -1,0 +1,52 @@
+./simulator -Ttx 20 -I 20 -blks 100 -n 40 -z1 0.4
+Total blocks : 100
+Longest chain length : 100
+Longest chain length / Total blocks : 1
+
+Total Branches : 1          // no branches
+Branch lengths : Longest : 100 Smallest : 100 Mean : 100
+
+SLOW And LOW CPU, Mean of fraction of blocks: 0.4
+SLOW And HIGH CPU, Mean of fraction of blocks: 1
+FAST And LOW CPU, Mean of fraction of blocks: 0.181818
+FAST And HIGH CPU, Mean of fraction of blocks: 1
+
+./simulator -Ttx 5 -I 0.4 -blks 100 -n 40 -z1 0.4
+Total blocks : 100
+Longest chain length : 87
+Longest chain length / Total blocks : 0.87
+
+Total Branches : 14
+Branch lengths : Longest : 87 Smallest : 7 Mean : 42.0714
+
+SLOW And LOW CPU, Mean of fraction of blocks: 0.6
+SLOW And HIGH CPU, Mean of fraction of blocks: 0.884091
+FAST And LOW CPU, Mean of fraction of blocks: 0.363636
+FAST And HIGH CPU, Mean of fraction of blocks: 0.81337
+
+./simulator -Ttx 0.05 -I 0.1 -blks 100 -n 40 -z1 0.4
+Total blocks : 100
+Longest chain length : 32
+Longest chain length / Total blocks : 0.32
+
+Total Branches : 47
+Branch lengths : Longest : 32 Smallest : 3 Mean : 18.383
+
+SLOW And LOW CPU, Mean of fraction of blocks: 0
+SLOW And HIGH CPU, Mean of fraction of blocks: 0.0333333
+FAST And LOW CPU, Mean of fraction of blocks: 0.0909091
+FAST And HIGH CPU, Mean of fraction of blocks: 0.532051
+
+./simulator -Ttx 20 -I 20 -blks 100 -n 20 -z1 0.4
+
+Total blocks : 100
+Longest chain length : 100
+Longest chain length / Total blocks : 1
+
+Total Branches : 1
+Branch lengths : Longest : 100 Smallest : 100 Mean : 100
+
+SLOW And LOW CPU, Mean of fraction of blocks: 1
+SLOW And HIGH CPU, Mean of fraction of blocks: 1
+FAST And LOW CPU, Mean of fraction of blocks: 1
+FAST And HIGH CPU, Mean of fraction of blocks: 1
